@@ -1,18 +1,24 @@
 #!/bin/bash
-#QUESTION 1
-#Run fastqc on all .fq files
-cd ~/Assignment1/AY21/fastq
-echo "Running fastqc on .fq files"
-fastqc *.fq
+#QUESTION 2
+#Concatenate summary files into one big one
+echo "Concatenating fastqc summaries into one file"
 
-#Create directory for fastqc results
-echo "Creating directory for fastqc results and moving the fastqc results to that folder"
-mkdir fastqc_results
+cd ~/Assignment1/AY21/fastq/fastqc_results
+cat */summary.txt > fastqc_summaries.txt 
 
-#Move fastqc results into new directory
-grep -lir 'fastqc' * |xargs  mv -t fastqc_results
+#Summary of FastQC
+echo "Number of raw sequences that passed one of the variables from fastqc:"
+grep -c PASS fastqc_summaries.txt
+#777
+echo "Number of raw sequences that had WARN for one of the variables from fastqc:"
+grep -c WARN fastqc_summaries.txt
+#86
+echo "Number of raw sequences that failed one of the variables from fastqc:"
+grep -c FAIL fastqc_summaries.txt
+#37
 
-#Unzip fastqc files 
-cd 
-cd ~/Assignment1/AY21/fastq/fastqc_results; for filename in *.zip; do unzip $filename; done
-rm -f *.zip
+#Per sequence quality score
+awk 'NR % 10 == 2' fastqc_summaries.txt > sequence_quality.txt
+echo "Number of raw sequences that passed the sequence quality test:"
+grep -c PASS sequence_quality.txt
+
