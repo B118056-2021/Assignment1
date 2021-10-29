@@ -1,13 +1,18 @@
 #!/bin/bash
-cd
-#Create Assignment 1 directory in home directory
-echo "Creating Assignment 1 folder"
-mkdir Assignment1; cd ~/Assignment1
+#QUESTION 1
+#Run fastqc on all .fq files
+cd ~/Assignment1/AY21/fastq
+echo "Running fastqc on .fq files"
+fastqc *.fq
 
-#Copy AY21 directory into own directory
-echo "Copying assignment data into Assignment 1 folder"
-cp -r /localdisk/data/BPSM/AY21 .
+#Create directory for fastqc results
+echo "Creating directory for fastqc results and moving the fastqc results to that folder"
+mkdir fastqc_results
 
-#Unzip files
-echo "Unzipping fastq files"
-cd ~/Assignment1/AY21/fastq; for gzip in *.gz; do gzip -d $gzip; done
+#Move fastqc results into new directory
+grep -lir 'fastqc' * |xargs  mv -t fastqc_results
+
+#Unzip fastqc files 
+cd 
+cd ~/Assignment1/AY21/fastq/fastqc_results; for filename in *.zip; do unzip $filename; done
+rm -f *.zip
