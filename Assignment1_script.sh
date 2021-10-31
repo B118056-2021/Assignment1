@@ -282,3 +282,20 @@ done
 awk '!/combinations/' combinations.txt > temp && mv temp combinations.txt
 cd
 mv Assignment1/AY21/expression_levels/folder/combinations.txt Assignment1/AY21/fold_change
+
+cd
+cd Assignment1/AY21/expression_levels
+echo "Generating text file with mean of gene counts for all groups"
+
+cut -f1,2 C2_t24_I.txt > means_all_groups.txt
+for file in *_U.txt *_I.txt
+do
+    cut -f6 $file | paste means_all_groups.txt - > tmp.txt
+    mv {tmp,means_all_groups}.txt
+    rm -f $tmp.txt
+done 
+
+cd
+mv Assignment1/AY21/expression_levels/means_all_groups.txt Assignment1/AY21/fold_change
+
+cd; cd Assignment1/AY21/fold_change
