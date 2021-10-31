@@ -267,6 +267,7 @@ mkdir fold_change
 
 cd
 cd Assignment1/AY21/expression_levels
+echo "Creating a text file with all the possible combinations for fold change study"
 for i in *.txt
 do
   for j in *.txt
@@ -283,11 +284,11 @@ awk '!/combinations/' combinations.txt > temp && mv temp combinations.txt
 cd
 mv Assignment1/AY21/expression_levels/folder/combinations.txt Assignment1/AY21/fold_change
 
-cd
-cd Assignment1/AY21/expression_levels
-echo "Generating text file with mean of gene counts for all groups"
-
+cd; cd Assignment1/AY21/expression_levels
+echo "Generating text file with mean of gene counts for all groups"\
+#Creating text file with gene names and their description
 cut -f1,2 C2_t24_I.txt > means_all_groups.txt
+#Adding mean counts for each file to one big file
 for file in *_U.txt *_I.txt
 do
     cut -f6 $file | paste means_all_groups.txt - > tmp.txt
