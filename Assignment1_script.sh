@@ -104,7 +104,7 @@ done
 # -a is the bed file
 # -b is the reads alignment bam file
 
-mkdir sam_files; mv *.sam bam_files
+mkdir sam_files; mv *.sam sam_files
 mkdir bam_files; mv *.bam bam_files
 mkdir bed_files; mv *.bed bed_files
 
@@ -267,7 +267,6 @@ mkdir fold_change
 
 cd
 cd Assignment1/AY21/expression_levels
-echo "Creating a text file with all the possible combinations for fold change study"
 for i in *.txt
 do
   for j in *.txt
@@ -281,14 +280,14 @@ do
 done
 
 awk '!/combinations/' combinations.txt > temp && mv temp combinations.txt
-cd
-mv Assignment1/AY21/expression_levels/folder/combinations.txt Assignment1/AY21/fold_change
+cd Assignment1/AY21/fold_change
+mv Assignment1/AY21/expression_levels/combinations.txt .
 
-cd; cd Assignment1/AY21/expression_levels
-echo "Generating text file with mean of gene counts for all groups"\
-#Creating text file with gene names and their description
+cd
+cd Assignment1/AY21/expression_levels
+echo "Generating text file with mean of gene counts for all groups"
+
 cut -f1,2 C2_t24_I.txt > means_all_groups.txt
-#Adding mean counts for each file to one big file
 for file in *_U.txt *_I.txt
 do
     cut -f6 $file | paste means_all_groups.txt - > tmp.txt
@@ -298,5 +297,3 @@ done
 
 cd
 mv Assignment1/AY21/expression_levels/means_all_groups.txt Assignment1/AY21/fold_change
-
-cd; cd Assignment1/AY21/fold_change
