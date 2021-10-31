@@ -252,48 +252,59 @@ do
     rm -f $file_temp.txt
 done
 
+#removing counts data of each replicate to only be left with mean average
+for file in *.txt
+do
+  cut -f1,2,5 < $file > $file.new
+  mv $file.new $file
+done
 
 cd
 cd Assignment1/AY21
-mkdir expression_levels
+mkdir expression_level
 
 cd
-mv Assignment1/AY21/genome_alignment/bed_files/*.txt Assignment1/AY21/expression_levels
+mv Assignment1/AY21/genome_alignment/bed_files/*.txt Assignment1/AY21/expression_level
 
 #QUESTION 6
 cd
 cd Assignment1/AY21
 mkdir fold_change
-
+   
 cd
-cd Assignment1/AY21/expression_levels
+cd Assignment1/AY21/expression_level
+
 for i in *.txt
 do
   for j in *.txt
   do
     if [ "$i" \< "$j" ]
     then
-     echo "$i:$j" >> combinations.txt
-     echo "$j:$i" >> combinations.txt
+        echo "Pairing groups ${i%.*} and ${j%.*} to generate fold change data"
+        cut -f1,2 C2_t24_I.txt > ${i%.*}.vs.${j%.*}.txt
+        cut -f6 $i | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
+        mv {tmp,${i%.*}.vs.${j%.*}}.txt
+        cut -f6 $j | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
+        mv {tmp,${i%.*}.vs.${j%.*}}.txt
     fi
   done
 done
+cd
+find Assignment1/AY21/expression_level/*.txt -name "*.vs.*" -exec mv -t Assignment1/AY21/fold_change {} +
 
-awk '!/combinations/' combinations.txt > temp && mv temp combinations.txt
 cd Assignment1/AY21/fold_change
-mv Assignment1/AY21/expression_levels/combinations.txt .
 
-cd
-cd Assignment1/AY21/expression_levels
-echo "Generating text file with mean of gene counts for all groups"
-
-cut -f1,2 C2_t24_I.txt > means_all_groups.txt
-for file in *_U.txt *_I.txt
+for file in *.txt
 do
-    cut -f6 $file | paste means_all_groups.txt - > tmp.txt
-    mv {tmp,means_all_groups}.txt
-    rm -f $tmp.txt
-done 
+    echo "Generating fold change data for $file"
+    awk '{sum = 0; for (i = 0; i <= NF; i++) sum += $i; sum /= 2; print sum}' $file > $file_temp.txt
+    cut -f1 $f_temp.txt | paste $file - > tmp.txt
+    mv {tmp,${file%.*}}.txt
+    rm -f $file_temp.txt
+done
 
-cd
-mv Assignment1/AY21/expression_levels/means_all_groups.txt Assignment1/AY21/fold_change
+#removing averages of the two groups to only have fold change
+for file in *.txt; do
+  cut -f1,2,5 < $file > $file.new
+  mv $file.new $file
+done
