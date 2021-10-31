@@ -255,7 +255,7 @@ done
 #removing counts data of each replicate to only be left with mean average
 for file in *.txt
 do
-  cut -f1,2,5 < $file > $file.new
+  cut -f1,2,6 < $file > $file.new
   mv $file.new $file
 done
 
@@ -308,3 +308,5 @@ for file in *.txt; do
   cut -f1,2,5 < $file > $file.new
   mv $file.new $file
 done
+
+echo "Project Finished!"
