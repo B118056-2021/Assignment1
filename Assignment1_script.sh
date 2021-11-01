@@ -16,25 +16,27 @@ cd ~/Assignment1/AY21/fastq; for gzip in *.gz; do gzip -d $gzip; done
 #Run fastqc on all .fq files
 cd ~/Assignment1/AY21/fastq
 echo "Running fastqc on .fq files"
-fastqc *.fq
+fastqc --threads 60 *.fq
 
 #Create directory for fastqc results
+cd
 echo "Creating directory for fastqc results and moving the fastqc results to that folder"
-mkdir fastqc_results
+mkdir  Assignment1/AY21/fastqc_results
 
 #Move fastqc results into new directory
-grep -lir 'fastqc' * |xargs  mv -t fastqc_results
+cd
+find Assignment1/AY21/fastq/* -name "*fastqc*" -exec mv -t Assignment1/AY21/fastqc_results {} +
 
 #Unzip fastqc files 
 cd 
-cd ~/Assignment1/AY21/fastq/fastqc_results; for filename in *.zip; do unzip $filename; done
+cd ~/Assignment1/AY21/fastqc_results; for filename in *.zip; do unzip $filename; done
 rm -f *.zip
 
 #QUESTION 2
 #Concatenate summary files into one big one
 echo "Concatenating fastqc summaries into one file"
 
-cd ~/Assignment1/AY21/fastq/fastqc_results
+cd ~/Assignment1/AY21/fastqc_results
 cat */summary.txt > fastqc_summaries.txt 
 
 #Summary of FastQC
@@ -52,7 +54,6 @@ grep -c FAIL fastqc_summaries.txt
 awk 'NR % 10 == 2' fastqc_summaries.txt > sequence_quality.txt
 echo "Number of raw sequences that passed the sequence quality test:"
 grep -c PASS sequence_quality.txt
-
 
 #QUESTION 3
 #Move to Tcongo_genome directory
@@ -114,9 +115,11 @@ cd
 cd Assignment1/AY21/genome_alignment/bed_files
 #Group 1 - WT: t=0, Uninduced
 echo "Generating text file with mean of the counts per gene for WT, t=0, uninduced: WT_t0_U"
+#cut column 4 and 5 as it contains the gene name and its description
 cut -f4,5 100k.WT-1-507_1_output.bed > WT_t0_U.txt
 for f in 100k.WT-1-507_1_output.bed 100k.WT-2-511_1_output.bed 100k.WT-3-512_1_output.bed
 do
+#cutting the 6th column as it contains the counts data for each file
     cut -f6 "$f" | paste WT_t0_U.txt - > tmp.txt
     mv {tmp,WT_t0_U}.txt
 done
@@ -236,6 +239,7 @@ do
     mv {tmp,C2_t48_I}.txt
 done
 
+#averaging the three columns containing the counts data and adding the result in a new column
 for file in *_U.txt
 do
     awk '{sum = 0; for (i = 0; i <= NF; i++) sum += $i; sum /= 3; print sum}' $file > $file_temp.txt
@@ -252,7 +256,7 @@ do
     rm -f $file_temp.txt
 done
 
-#removing counts data of each replicate to only be left with mean average
+#removing counts data of each replicate (column 3,4,5) to only be left with mean average (column 6)
 for file in *.txt
 do
   cut -f1,2,6 < $file > $file.new
@@ -273,6 +277,7 @@ mkdir fold_change
    
 cd; cd Assignment1/AY21/expression_levels
 
+#Creating combination of files for fold change analysis
 for i in *.txt
 do
   for j in *.txt
@@ -280,10 +285,12 @@ do
     if [ "$i" \< "$j" ]
     then
         echo "Pairing groups ${i%.*} and ${j%.*} to generate fold change data"
+        # copying column 1 and 2 from this file as it contains gene name and its description
         cut -f1,2 C2_t24_I.txt > ${i%.*}.vs.${j%.*}.txt
-        cut -f6 $i | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
+        # copying column 3 which contains expression levels averages
+        cut -f3 $i | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
         mv {tmp,${i%.*}.vs.${j%.*}}.txt
-        cut -f6 $j | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
+        cut -f3 $j | paste ${i%.*}.vs.${j%.*}.txt - > tmp.txt
         mv {tmp,${i%.*}.vs.${j%.*}}.txt
     fi
   done
@@ -292,6 +299,7 @@ done
 cd
 find Assignment1/AY21/expression_levels/*.txt -name "*.vs.*" -exec mv -t Assignment1/AY21/fold_change {} +
 
+#For each pair, calculate the average fold change for each gene and addn the results in a new column
 cd Assignment1/AY21/fold_change
 for file in *.txt
 do
@@ -302,7 +310,7 @@ do
     rm -f $file_temp.txt
 done
 
-#removing averages of the two groups to only have fold change
+#removing averages of the two groups to only be left with fold change data
 for file in *.txt; do
   cut -f1,2,5 < $file > $file.new
   mv $file.new $file
