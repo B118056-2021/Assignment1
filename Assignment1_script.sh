@@ -261,18 +261,17 @@ done
 
 cd
 cd Assignment1/AY21
-mkdir expression_level
+mkdir expression_levels
 
 cd
-mv Assignment1/AY21/genome_alignment/bed_files/*.txt Assignment1/AY21/expression_level
+mv Assignment1/AY21/genome_alignment/bed_files/*.txt Assignment1/AY21/expression_levels
 
 #QUESTION 6
 cd
 cd Assignment1/AY21
 mkdir fold_change
    
-cd
-cd Assignment1/AY21/expression_level
+cd; cd Assignment1/AY21/expression_levels
 
 for i in *.txt
 do
@@ -289,11 +288,11 @@ do
     fi
   done
 done
+
 cd
-find Assignment1/AY21/expression_level/*.txt -name "*.vs.*" -exec mv -t Assignment1/AY21/fold_change {} +
+find Assignment1/AY21/expression_levels/*.txt -name "*.vs.*" -exec mv -t Assignment1/AY21/fold_change {} +
 
 cd Assignment1/AY21/fold_change
-
 for file in *.txt
 do
     echo "Generating fold change data for $file"
